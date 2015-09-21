@@ -1,0 +1,12 @@
+/apps/<hostname>:
+   /service (name of service, from registrator's SERVICE_NAME)
+   /dns/
+      /name (optional, name of dnsimple hostname to update)
+   /ip/
+      /v4 (optional, defaults to host IP)
+      /v6 (optional, defaults to host IPv6)
+   /aliases/ (optional, filenames = aliases)
+   /ports/
+      /external (optional, defaults to 80)
+      /ssl (optional, defaults to 443 is /cert present)
+   /cert (inline, optional, includes public, private, ca, chain)
