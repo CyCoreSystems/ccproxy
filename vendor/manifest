@@ -1,0 +1,72 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/coreos/etcd/Godeps/_workspace/src/github.com/ugorji/go/codec",
+			"repository": "https://github.com/coreos/etcd",
+			"revision": "f3d2b5831c027a73f22b8c7c44a65294d560c519",
+			"branch": "master",
+			"path": "/Godeps/_workspace/src/github.com/ugorji/go/codec"
+		},
+		{
+			"importpath": "github.com/coreos/etcd/Godeps/_workspace/src/golang.org/x/net/context",
+			"repository": "https://github.com/coreos/etcd",
+			"revision": "f3d2b5831c027a73f22b8c7c44a65294d560c519",
+			"branch": "master",
+			"path": "/Godeps/_workspace/src/golang.org/x/net/context"
+		},
+		{
+			"importpath": "github.com/coreos/etcd/client",
+			"repository": "https://github.com/coreos/etcd",
+			"revision": "f3d2b5831c027a73f22b8c7c44a65294d560c519",
+			"branch": "master",
+			"path": "/client"
+		},
+		{
+			"importpath": "github.com/coreos/etcd/pkg/pathutil",
+			"repository": "https://github.com/coreos/etcd",
+			"revision": "f3d2b5831c027a73f22b8c7c44a65294d560c519",
+			"branch": "master",
+			"path": "/pkg/pathutil"
+		},
+		{
+			"importpath": "github.com/coreos/etcd/pkg/types",
+			"repository": "https://github.com/coreos/etcd",
+			"revision": "f3d2b5831c027a73f22b8c7c44a65294d560c519",
+			"branch": "master",
+			"path": "/pkg/types"
+		},
+		{
+			"importpath": "github.com/coreos/go-systemd/dbus",
+			"repository": "https://github.com/coreos/go-systemd",
+			"revision": "4fc73faa1acf13a043033f286858dc566150f401",
+			"branch": "master",
+			"path": "/dbus"
+		},
+		{
+			"importpath": "github.com/godbus/dbus",
+			"repository": "https://github.com/godbus/dbus",
+			"revision": "9bb9dbf0e53309fa81d26e7230cbb6cff9373cad",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/termie/go-shutil",
+			"repository": "https://github.com/termie/go-shutil",
+			"revision": "bcacb06fecaeec8dc42af03c87c6949f4a05c74c",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/weppos/go-dnsimple",
+			"repository": "https://github.com/weppos/go-dnsimple",
+			"revision": "0fa39e60588256f40de6a263d62af813cf350c1f",
+			"branch": "master"
+		},
+		{
+			"importpath": "golang.org/x/net/context",
+			"repository": "https://go.googlesource.com/net",
+			"revision": "db8e4de5b2d6653f66aea53094624468caad15d2",
+			"branch": "master",
+			"path": "/context"
+		}
+	]
+}

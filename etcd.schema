@@ -1,12 +1,22 @@
-/apps/<hostname>:
-   /service (name of service, from registrator's SERVICE_NAME)
+/cycore/proxy/services/<serviceName>:
    /dns/
-      /name (optional, name of dnsimple hostname to update)
+      /name1
+      /name2
+      /...
+   /cert (inline, optional, includes public, private, ca, chain)
+
+   ### UNSUPPORTED FEATURES ###
+   # DO NOT SPECIFY IPs at this point; we are using SNI
    /ip/
       /v4 (optional, defaults to host IP)
       /v6 (optional, defaults to host IPv6)
-   /aliases/ (optional, filenames = aliases)
+   # No support for alternate ports at this time
    /ports/
       /external (optional, defaults to 80)
       /ssl (optional, defaults to 443 is /cert present)
-   /cert (inline, optional, includes public, private, ca, chain)
+   ############################
+
+# Store the dnsimple record id for each instance so that it can be updated and/or
+# deleted
+/cycore/proxy/dns/<instanceId>: stores the dnsimple record id of the record for this instance, if such exists
+   
