@@ -15,7 +15,7 @@ const dnsNamespace = "/cycore/proxy/dns"
 const registratorNamespace = "/srv"
 
 // The instance id
-var instanceId string
+var instanceID string
 
 // services is the internal list of all Services
 var services map[string]*Service
@@ -30,12 +30,14 @@ type Service struct {
 	Backends Backends // List of active backends for the service
 }
 
+func init() {
+	// Store the instanceId for other components to reference
+	instanceID = os.Getenv("INSTANCE_ID")
+}
+
 // Go starts the service manager, which monitors etcd,
 // writes configurations, and updates haproxy, as necessary
 func Go(stopChan chan struct{}) (err error) {
-	// Store the instanceId for other components to reference
-	instanceId = os.Getenv("INSTANCE_ID")
-
 	// Connect to etcd
 	etcd, err = client.New(client.Config{
 		Endpoints: strings.Split(os.Getenv("ETCD_ENDPOINTS"), ","),

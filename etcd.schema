@@ -18,5 +18,6 @@
 
 # Store the dnsimple record id for each instance so that it can be updated and/or
 # deleted
-/cycore/proxy/dns/<instanceId>: stores the dnsimple record id of the record for this instance, if such exists
+/cycore/proxy/dns/ipv4/<instanceId>: stores the dnsimple record id of the A record for this instance, if such exists
+/cycore/proxy/dns/ipv6/<instanceId>: stores the dnsimple record id of the AAAA record for this instance, if such exists
    

@@ -108,7 +108,7 @@ func Reload() (err error) {
 		return err
 	}
 
-	_, err = conn.ReloadUnit("haproxy.cycore@"+instanceId, "ignore-dependencies", nil)
+	_, err = conn.ReloadUnit("haproxy.cycore@"+instanceID, "ignore-dependencies", nil)
 
 	return nil
 }
