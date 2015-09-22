@@ -140,21 +140,21 @@ frontend public
 	reqadd X-Forwarded-Proto:\ http
 
 	# Bind aliases to backends
-	{{range _, $service := .Services}}
-		{{range _, $name := .Names}}
+	{{range $service := .Services}}
+		{{range $name := .Names}}
 			use_backend {{$service.Name}} if { req_ssl_sni  {{$name}} }
 		{{end}}
 	{{end}}
 
 
 frontend public_ssl
-	bind {{.IPv4}}:443 ssl {{range _, $service := .Services}}{{if $service.Cert}} crt {{call $service.CertFile}} {{end}} {{end}}
-	bind {{.IPv6}}:443 ssl {{range _, $service := .Services}}{{if $service.Cert}} crt {{call $service.CertFile}} {{end}} {{end}}
+	bind {{.IPv4}}:443 ssl {{range $service := .Services}}{{if $service.Cert}} crt {{call $service.CertFile}} {{end}} {{end}}
+	bind {{.IPv6}}:443 ssl {{range $service := .Services}}{{if $service.Cert}} crt {{call $service.CertFile}} {{end}} {{end}}
 	reqadd X-Forwarded-Proto:\ https
 
 	# Bind SNI indicators to backends
-	{{range _, $service := .Services}}
-		{{range _, $name := .Names}}
+	{{range $service := .Services}}
+		{{range $name := .Names}}
 			use_backend {{$service.Name}} if { req_ssl_sni  {{$name}} }
 		{{end}}
 	{{end}}
@@ -162,15 +162,15 @@ frontend public_ssl
 # -
 # Backends/Services
 # -
-{{range _, $service := .Services}}
+{{range $service := .Services}}
 backend {{$service.Name}}
 	mode http
 	cookie {{$service.Name}} insert indirect nocache
 	option forwardfor
 	balance roundrobin
 
-	{{range $i, $node := $service.Backends}}
-	server srv{{$i}} {{$node}}
+	{{range $node := $service.Backends}}
+	server srv{{index}} {{$node}}
 	{{end}}
 {{end}}
 
