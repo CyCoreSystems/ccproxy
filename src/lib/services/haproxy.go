@@ -170,7 +170,7 @@ backend {{$service.Name}}
 	balance roundrobin
 
 	{{range $node := $service.Backends}}
-	server srv{{index}} {{$node}}
+	server srv{{index}} {{$node}} cookie srv{{$index}} check
 	{{end}}
 {{end}}
 
