@@ -8,24 +8,25 @@ ExecStartPre=-/usr/bin/docker kill %p
 ExecStartPre=-/usr/bin/docker rm %p
 ExecStartPre=/usr/bin/mkdir -p /data/haproxy.cycore/certs
 ExecStartPre=/usr/bin/touch /data/haproxy.cycore/haproxy.cfg
+ExecStartPre=-/usr/bin/docker pull quay.io/cycore/ccproxy
 ExecStart=/usr/bin/docker run --rm --name %p \
    -v /data/haproxy.cycore:/data \
    -v /var/run/dbus:/var/run/dbus \
    -v /run/systemd:/run/systemd \
+   -v /usr/share/ca-certificates:/etc/ssl/certs \
    -e COREOS_PUBLIC_IPV4=${COREOS_PUBLIC_IPV4} \
    -e COREOS_PUBLIC_IPV6=${COREOS_PUBLIC_IPV6} \
    -e ETCD_ENDPOINTS=http://${COREOS_PRIVATE_IPV4}:2379 \
    -e DNSIMPLE_EMAIL=myemail@gmail.com \
    -e DNSIMPLE_API=myAPIKey \
    -e INSTANCE_ID=%i \
-   haproxy haproxy -f /etc/haproxy.cfg -p /var/run/haproxy.pid
+   quay.io/cycore/ccproxy
 ExecStopPost=-/usr/bin/docker stop %p
 ExecStopPost=-/usr/bin/docker rm %p
-ExecReload=/usr/bin/docker exec %p haproxy -f /usr/local/etc/haproxy/haproxy.cfg -p /var/run/haproxy.pid -sf 
 Restart=always
 RestartSec=10s
 TimeoutStartSec=120
 TimeoutStopSec=15
 
 [X-Fleet]
-Conflicts=haproxy.cycore*
+Conflicts=ccproxy*

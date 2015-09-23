@@ -151,6 +151,8 @@ func ParseServiceNode(n *client.Node) (*Service, error) {
 		return nil, fmt.Errorf("No DNS names found for service")
 	}
 
+	cert := certFromKeys(n.Nodes)
+
 	backends, err := backendsFor(serviceName)
 	if err != nil {
 		return nil, err
@@ -160,6 +162,7 @@ func ParseServiceNode(n *client.Node) (*Service, error) {
 		Name:     serviceName,
 		DNS:      dnsNames,
 		Backends: backends,
+		Cert:     cert,
 	}, nil
 }
 
@@ -191,6 +194,17 @@ func dnsFromKeys(keys client.Nodes) []string {
 		}
 	}
 	return names
+}
+
+// certFromKeys extracts the cert (if present) from the
+// etcd service nodes
+func certFromKeys(keys client.Nodes) (cert string) {
+	for _, n := range keys {
+		if lastKeyName(n.Key) == "cert" {
+			cert = n.Value
+		}
+	}
+	return cert
 }
 
 // Determine if two services are equivalent

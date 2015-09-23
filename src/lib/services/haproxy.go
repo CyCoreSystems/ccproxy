@@ -51,6 +51,10 @@ func certFilename(serviceName string) string {
 	return haproxyCertsDir + "/" + serviceName + ".pem"
 }
 
+func (s *Service) CertFile() string {
+	return certFilename(s.Name)
+}
+
 // WriteCerts writes each certificate in the service list
 // to a file
 func WriteCerts() (err error) {
@@ -141,20 +145,20 @@ frontend public
 
 	# Bind aliases to backends
 	{{range $service := .Services}}
-		{{range $name := .Names}}
+		{{range $name := .DNS}}
 			use_backend {{$service.Name}} if { req_ssl_sni  {{$name}} }
 		{{end}}
 	{{end}}
 
 
 frontend public_ssl
-	bind {{.IPv4}}:443 ssl {{range $service := .Services}}{{if $service.Cert}} crt {{call $service.CertFile}} {{end}} {{end}}
-	bind {{.IPv6}}:443 ssl {{range $service := .Services}}{{if $service.Cert}} crt {{call $service.CertFile}} {{end}} {{end}}
+	bind {{.IPv4}}:443 ssl {{range $service := .Services}}{{if $service.Cert}} crt {{$service.CertFile}} {{end}} {{end}}
+	bind {{.IPv6}}:443 ssl {{range $service := .Services}}{{if $service.Cert}} crt {{$service.CertFile}} {{end}} {{end}}
 	reqadd X-Forwarded-Proto:\ https
 
 	# Bind SNI indicators to backends
 	{{range $service := .Services}}
-		{{range $name := .Names}}
+		{{range $name := .DNS}}
 			use_backend {{$service.Name}} if { req_ssl_sni  {{$name}} }
 		{{end}}
 	{{end}}
@@ -169,8 +173,8 @@ backend {{$service.Name}}
 	option forwardfor
 	balance roundrobin
 
-	{{range $node := $service.Backends}}
-	server srv{{index}} {{$node}} cookie srv{{$index}} check
+	{{range $index, $node := $service.Backends}}
+	server srv{{$index}} {{$node}} cookie srv{{$index}} check
 	{{end}}
 {{end}}
 

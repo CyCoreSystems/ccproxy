@@ -12,7 +12,7 @@ import (
 )
 
 var domain = "cycore.io"
-var proxyName = "proxy.cycore.io"
+var proxyName = "proxy"
 
 const dnsNamespace = "/cycore/proxy/dns"
 
@@ -43,7 +43,7 @@ func Go() (err error) {
 		return fmt.Errorf("COREOS_PUBLIC_IPV4 not defined")
 	}
 
-	proxyIPv6 = os.Getenv("COREOS_PUBLIC_IPV4")
+	proxyIPv6 = os.Getenv("COREOS_PUBLIC_IPV6")
 	if proxyIPv6 == "" {
 		return fmt.Errorf("COREOS_PUBLIC_IPV6 not defined")
 	}
@@ -153,11 +153,15 @@ func Update() (err error) {
 }
 
 func create(recordType string, recordValue string) (int, error) {
-	record, _, err := dns.CreateRecord(domain, dnsimple.Record{
+	r := dnsimple.Record{
 		Name:    proxyName,
 		Type:    recordType,
 		Content: recordValue,
-	})
+		TTL:     60,
+	}
+	fmt.Printf("Creating DNS Record: %+v\n", r)
+
+	record, _, err := dns.CreateRecord(domain, r)
 
 	return record.Id, err
 }
