@@ -112,7 +112,7 @@ func Reload() (err error) {
 		return err
 	}
 
-	_, err = conn.ReloadUnit("haproxy.cycore@"+instanceID, "ignore-dependencies", nil)
+	_, err = conn.RestartUnit("haproxy.cycore@"+instanceID, "ignore-dependencies", nil)
 
 	return nil
 }
@@ -145,9 +145,7 @@ frontend public
 
 	# Bind aliases to backends
 	{{range $service := .Services}}
-		{{range $name := .DNS}}
-			use_backend {{$service.Name}} if { req_ssl_sni  {{$name}} }
-		{{end}}
+		use_backend {{$service.Name}} if { hdr(host) -i {{range $name := .DNS}} {{$name}}{{end}} }
 	{{end}}
 
 
@@ -159,7 +157,7 @@ frontend public_ssl
 	# Bind SNI indicators to backends
 	{{range $service := .Services}}
 		{{range $name := .DNS}}
-			use_backend {{$service.Name}} if { req_ssl_sni  {{$name}} }
+			use_backend {{$service.Name}} if { ssl_fc_sni {{$name}} }
 		{{end}}
 	{{end}}
 
