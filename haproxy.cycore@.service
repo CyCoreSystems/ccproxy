@@ -16,7 +16,11 @@ ExecStart=/usr/bin/docker run --rm --name %p --net=host \
    haproxy haproxy -f /etc/haproxy.cfg -p /var/run/haproxy.pid
 ExecStopPost=-/usr/bin/docker stop %p
 ExecStopPost=-/usr/bin/docker rm %p
-ExecReload=/usr/bin/docker exec %p haproxy -f /etc/haproxy/haproxy.cfg -p /var/run/haproxy.pid -sf 
+# Reload does not work because:
+#   a) haproxy terminates and restarts its process
+#   b) haproxy runs as PID 1 of its container
+#   c) a + b => container exits
+#ExecReload=/usr/bin/docker exec %p haproxy -f /etc/haproxy/haproxy.cfg -p /var/run/haproxy.pid -sf 
 Restart=always
 RestartSec=10s
 TimeoutStartSec=120
