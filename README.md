@@ -1,5 +1,16 @@
 # ccproxy
 
+[![Docker Repository on Quay](https://quay.io/repository/cycore/ccproxy/status "Docker Repository on Quay")](https://quay.io/repository/cycore/ccproxy)
+
+An etcd-backed haproxy sidekick.
+
+Features:
+  * SNI (multiple certs on a single IP)
+  * etcd-based configuration and certificate storage, with change detection
+  * manages restarts of haproxy on configuration change (via systemd)
+
+See the [Unit file](ccproxy@.service) for usage information.
+
 ## Frontends
 
 Frontends use the primary public IP addresses for the hosting node, registering them
