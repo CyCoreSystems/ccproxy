@@ -15,6 +15,9 @@ import (
 func main() {
 	stopChan := make(chan struct{})
 
+	// Make sure /tmp exists
+	os.Mkdir("/tmp", 0777)
+
 	// Start the services manager
 	err := services.Go(stopChan)
 	if err != nil {
