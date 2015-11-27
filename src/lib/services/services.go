@@ -214,14 +214,17 @@ func certFromKeys(keys client.Nodes) (cert string) {
 // Determine if two services are equivalent
 func (s *Service) Equals(n *Service) bool {
 	if s.Name != n.Name {
+		fmt.Println("Names differ:", s.Name, n.Name)
 		return false
 	}
 
 	if s.Cert != n.Cert {
+		fmt.Println("Certs differ:", s.Cert, n.Cert)
 		return false
 	}
 
 	if len(s.DNS) != len(n.DNS) {
+		fmt.Println("Number of DNS differ:", len(s.DNS), len(n.DNS))
 		return false
 	}
 	var equal bool
@@ -233,11 +236,17 @@ func (s *Service) Equals(n *Service) bool {
 			}
 		}
 		if !equal {
+			fmt.Println("DNS entry not found in list:", i, n.DNS)
 			return false
 		}
 	}
 
+	// Merge and expire old backends with new
+	n.Backends = s.Backends.Merge(n.Backends).Expire()
+
+	// Check for differences in backends list
 	if !s.Backends.Equals(n.Backends) {
+		fmt.Println("Backends differ")
 		return false
 	}
 
