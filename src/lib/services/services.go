@@ -89,14 +89,18 @@ func Update() error {
 	}
 
 	// Always call update on the first round
+	//fmt.Println("Writing new configuration")
 	err = Write()
 	if err != nil {
+		fmt.Println("Failed to write configuration:", err.Error())
 		return err
 	}
 
+	//fmt.Println("Restarting haproxy")
 	err = Reload()
 	if err != nil {
-		return err
+		fmt.Println("Warning- Failed to restart haproxy:", err.Error())
+		// Don't treat this as an error
 	}
 
 	return nil
@@ -174,7 +178,7 @@ func lastKeyName(key string) string {
 
 // serviceFromRegistratorKey pulls the service name from a registrator key
 func serviceFromRegistratorKey(key string) string {
-	s := strings.TrimPrefix(key, registratorNamespace)
+	s := strings.TrimPrefix(key, registratorNamespace+"/")
 	if s == key {
 		// Not a registrator namespace key
 		return ""
@@ -261,6 +265,7 @@ func watchServices(ctx context.Context) {
 			continue
 		}
 
+		fmt.Println("Update of service configuration detected")
 		Update()
 	}
 }
@@ -297,7 +302,7 @@ func watchBackends(ctx context.Context) {
 		for _, s := range services {
 			if serviceName == s.Name {
 				Update()
-				continue
+				break
 			}
 		}
 	}

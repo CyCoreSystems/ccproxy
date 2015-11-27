@@ -112,9 +112,9 @@ func Reload() (err error) {
 		return err
 	}
 
-	_, err = conn.RestartUnit("haproxy.cycore@"+instanceID, "ignore-dependencies", nil)
+	_, err = conn.RestartUnit("haproxy.cycore@"+instanceID+".service", "ignore-dependencies", nil)
 
-	return nil
+	return err
 }
 
 const proxyTemplateString = `

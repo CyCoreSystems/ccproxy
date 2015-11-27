@@ -2,7 +2,7 @@
 Description=HAProxy for CyCore Services
 After=docker.service
 After=ccproxy@%i.service
-Requires=ccproxy@%i.service
+Wants=ccproxy@%i.service
 
 [Service]
 EnvironmentFile=/etc/environment
@@ -14,7 +14,7 @@ ExecStart=/usr/bin/docker run --rm --name %p --net=host \
    -v /data/haproxy.cycore/certs:/data/certs \
    -v /data/haproxy.cycore/haproxy.cfg:/etc/haproxy.cfg \
    haproxy haproxy -f /etc/haproxy.cfg -p /var/run/haproxy.pid
-ExecStopPost=-/usr/bin/docker stop %p
+ExecStopPost=-/usr/bin/docker kill %p
 ExecStopPost=-/usr/bin/docker rm %p
 # Reload does not work because:
 #   a) haproxy terminates and restarts its process
@@ -22,7 +22,7 @@ ExecStopPost=-/usr/bin/docker rm %p
 #   c) a + b => container exits
 #ExecReload=/usr/bin/docker exec %p haproxy -f /etc/haproxy/haproxy.cfg -p /var/run/haproxy.pid -sf 
 Restart=always
-RestartSec=10s
+RestartSec=1s
 TimeoutStartSec=120
 TimeoutStopSec=15
 
