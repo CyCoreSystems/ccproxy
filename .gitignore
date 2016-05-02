@@ -1,4 +1,5 @@
 /bin/
 /pkg/
+/vendor/pkg/
 *.swp
 /test.sh
