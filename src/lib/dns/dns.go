@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/aetrion/dnsimple-go/dnsimple"
 	"github.com/coreos/etcd/client"
-	"github.com/weppos/go-dnsimple/dnsimple"
 	"golang.org/x/net/context"
 )
 
@@ -16,7 +16,7 @@ var proxyName = "proxy"
 
 const dnsNamespace = "/cycore/proxy/dns"
 
-var dns *dnsimple.DomainsService
+var dns *dnsimple.Client
 var etcd client.Client
 
 var (
@@ -24,15 +24,15 @@ var (
 	proxyIPv4  string
 	proxyIPv6  string
 
-	dnsimpleEmail string
-	dnsimpleAPI   string
+	dnsimpleToken string
+	dnsimpleID    string // Account struct from login
 
 	recordID4 int // DNS record ID for IPv4 entry
 	recordID6 int // DNS record ID for IPv6 entry
 )
 
 // Go starts the dns manager
-func Go() (err error) {
+func Go(ctx context.Context) (err error) {
 	instanceID = os.Getenv("INSTANCE_ID")
 	if instanceID == "" {
 		return fmt.Errorf("INSTANCE_ID not defined")
@@ -48,18 +48,22 @@ func Go() (err error) {
 		return fmt.Errorf("COREOS_PUBLIC_IPV6 not defined")
 	}
 
-	dnsimpleEmail = os.Getenv("DNSIMPLE_EMAIL")
-	if dnsimpleEmail == "" {
-		return fmt.Errorf("DNSIMPLE_EMAIL not defined")
-	}
-
-	dnsimpleAPI = os.Getenv("DNSIMPLE_API")
-	if dnsimpleAPI == "" {
-		return fmt.Errorf("DNSIMPLE_API not defined")
+	dnsimpleToken = os.Getenv("DNSIMPLE_TOKEN")
+	if dnsimpleToken == "" {
+		return fmt.Errorf("DNSIMPLE_TOKEN not defined")
 	}
 
 	// Create a new dnsimple client
-	dns = dnsimple.NewClient(dnsimpleAPI, dnsimpleEmail).Domains
+	dns = dnsimple.NewClient(dnsimple.NewOauthTokenCredentials(dnsimpleToken))
+
+	// Store the account ID
+	/*
+		whoamiResponse, err := dns.Identity.Whoami()
+		if err != nil {
+			return fmt.Errorf("ERROR: could not fetch DNSimple ID: %s", err.Error())
+		}
+		dnsimpleID = strconv.Itoa(whoamiResponse.Data.Account.ID)
+	*/
 
 	// Create a new etcd client
 	etcd, err = client.New(client.Config{
@@ -100,7 +104,7 @@ func Go() (err error) {
 	}
 
 	// Update the DNS record with our IP
-	err = Update()
+	err = Update(ctx)
 	if err != nil {
 		return err
 	}
@@ -109,7 +113,8 @@ func Go() (err error) {
 }
 
 // Update sets the dns record
-func Update() (err error) {
+func Update(ctx context.Context) error {
+	var err error
 	var id int
 
 	k := client.NewKeysAPI(etcd)
@@ -122,13 +127,17 @@ func Update() (err error) {
 		}
 
 		// Set the record ID in etcd
-		_, err = k.Set(context.Background(), dnsNamespace+"/ipv4/"+instanceID, strconv.Itoa(id), nil)
+		_, err = k.Set(ctx, dnsNamespace+"/ipv4/"+instanceID, strconv.Itoa(id), nil)
 		if err != nil {
 			return err
 		}
 
 	} else {
 		err = update(recordID4, proxyIPv4)
+		if err != nil {
+			fmt.Println("Failed to update DNS A record:", recordID4, proxyIPv4, err)
+			return err
+		}
 	}
 	if err != nil {
 		return err
@@ -142,18 +151,22 @@ func Update() (err error) {
 		}
 
 		// Set the record ID in etcd
-		_, err = k.Set(context.Background(), dnsNamespace+"/ipv6/"+instanceID, strconv.Itoa(id), nil)
+		_, err = k.Set(ctx, dnsNamespace+"/ipv6/"+instanceID, strconv.Itoa(id), nil)
 		if err != nil {
 			return err
 		}
 	} else {
 		err = update(recordID6, proxyIPv6)
+		if err != nil {
+			fmt.Println("Failed to update DNS AAAA record:", recordID6, proxyIPv6, err)
+			return err
+		}
 	}
-	return err
+	return nil
 }
 
 func create(recordType string, recordValue string) (int, error) {
-	r := dnsimple.Record{
+	r := dnsimple.ZoneRecord{
 		Name:    proxyName,
 		Type:    recordType,
 		Content: recordValue,
@@ -161,14 +174,24 @@ func create(recordType string, recordValue string) (int, error) {
 	}
 	fmt.Printf("Creating DNS Record: %+v\n", r)
 
-	record, _, err := dns.CreateRecord(domain, r)
+	resp, err := dns.Zones.CreateRecord("_", domain, r)
 
-	return record.Id, err
+	return resp.Data.ID, err
 }
 
 func update(id int, recordValue string) (err error) {
-	_, _, err = dns.UpdateRecord(domain, id, dnsimple.Record{
+	// First, check the existing value to see if we need to change it
+	resp, err := dns.Zones.GetRecord("_", domain, id)
+	if err != nil {
+		return
+	}
+	if resp.Data.Content == recordValue {
+		fmt.Printf("No update needed\n")
+		return
+	}
+
+	_, err = dns.Zones.UpdateRecord("_", domain, id, dnsimple.ZoneRecord{
 		Content: recordValue,
 	})
-	return err
+	return
 }

@@ -23,6 +23,7 @@ var services map[string]*Service
 // etcd is the reference to the etcd client
 var etcd client.Client
 
+// Service represents a discrete service in the proxy
 type Service struct {
 	Name     string   // Service Name
 	DNS      []string // DNS hostnames for service
@@ -37,7 +38,7 @@ func init() {
 
 // Go starts the service manager, which monitors etcd,
 // writes configurations, and updates haproxy, as necessary
-func Go(stopChan chan struct{}) (err error) {
+func Go(ctx context.Context) (err error) {
 	// Connect to etcd
 	etcd, err = client.New(client.Config{
 		Endpoints: strings.Split(os.Getenv("ETCD_ENDPOINTS"), ","),
@@ -57,15 +58,15 @@ func Go(stopChan chan struct{}) (err error) {
 	}
 
 	// Watch for changes
-	go Watch(stopChan)
+	go Watch(ctx)
 
 	return nil
 }
 
 // Watch watches all relevent etcd keys and updates
 // the services on change
-func Watch(stopChan chan struct{}) {
-	ctx, cancel := context.WithCancel(context.Background())
+func Watch(ctx context.Context) {
+	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	// Run service watcher
@@ -73,7 +74,7 @@ func Watch(stopChan chan struct{}) {
 	go watchBackends(ctx)
 
 	// Wait for stop signal
-	<-stopChan
+	<-ctx.Done()
 }
 
 // Update regenerates the list of services and, if there
@@ -211,7 +212,7 @@ func certFromKeys(keys client.Nodes) (cert string) {
 	return cert
 }
 
-// Determine if two services are equivalent
+// Equals determines if two services are equivalent
 func (s *Service) Equals(n *Service) bool {
 	if s.Name != n.Name {
 		fmt.Println("Names differ:", s.Name, n.Name)

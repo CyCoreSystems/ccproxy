@@ -2,6 +2,13 @@
 	"version": 0,
 	"dependencies": [
 		{
+			"importpath": "github.com/aetrion/dnsimple-go/dnsimple",
+			"repository": "https://github.com/aetrion/dnsimple-go",
+			"revision": "31541dfdacda3b3bb9334ad346d6dd9ab050486e",
+			"branch": "master",
+			"path": "/dnsimple"
+		},
+		{
 			"importpath": "github.com/coreos/etcd/Godeps/_workspace/src/github.com/ugorji/go/codec",
 			"repository": "https://github.com/coreos/etcd",
 			"revision": "f3d2b5831c027a73f22b8c7c44a65294d560c519",
@@ -53,12 +60,6 @@
 			"importpath": "github.com/termie/go-shutil",
 			"repository": "https://github.com/termie/go-shutil",
 			"revision": "bcacb06fecaeec8dc42af03c87c6949f4a05c74c",
-			"branch": "master"
-		},
-		{
-			"importpath": "github.com/weppos/go-dnsimple",
-			"repository": "https://github.com/weppos/go-dnsimple",
-			"revision": "0fa39e60588256f40de6a263d62af813cf350c1f",
 			"branch": "master"
 		},
 		{

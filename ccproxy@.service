@@ -16,8 +16,7 @@ ExecStart=/usr/bin/docker run --rm --name %p \
    -v /usr/share/ca-certificates:/etc/ssl/certs \
    -e COREOS_PUBLIC_IPV4=${COREOS_PUBLIC_IPV4} \
    -e COREOS_PUBLIC_IPV6=${COREOS_PUBLIC_IPV6} \
-   -e ETCD_ENDPOINTS=http://${COREOS_PRIVATE_IPV4}:2379 \
-   -e DNSIMPLE_EMAIL=myemail@gmail.com \
+   -e ETCD_ENDPOINTS=http://${COREOS_PUBLIC_IPV4}:2379 \
    -e DNSIMPLE_API=myAPIKey \
    -e INSTANCE_ID=%i \
    quay.io/cycore/ccproxy
